@@ -25,7 +25,7 @@
 #include <linux/input.h>
 #include <linux/firmware.h>
 #include <linux/completion.h>
-#if (defined CONFIG_MACH_XIAOMI_MIDO)
+#ifdef CONFIG_MACH_XIAOMI_MIDO
 #include <linux/switch.h>
 #endif
 #include <sound/soc.h>
@@ -45,7 +45,7 @@
 #define OCP_ATTEMPT 1
 #define HS_DETECT_PLUG_TIME_MS (3 * 1000)
 #define SPECIAL_HS_DETECT_TIME_MS (2 * 1000)
-#if (defined CONFIG_MACH_XIAOMI_MIDO)
+#ifdef CONFIG_MACH_XIAOMI_MIDO
 #define MBHC_BUTTON_PRESS_THRESHOLD_MIN 750
 #else
 #define MBHC_BUTTON_PRESS_THRESHOLD_MIN 250
@@ -74,14 +74,14 @@ enum wcd_mbhc_cs_mb_en_flag {
 	WCD_MBHC_EN_NONE,
 };
 
-#if (defined CONFIG_MACH_XIAOMI_MIDO)
+#ifdef CONFIG_MACH_XIAOMI_MIDO
 static struct switch_dev accdet_data;
 #endif
 
 static void wcd_mbhc_jack_report(struct wcd_mbhc *mbhc,
 				struct snd_soc_jack *jack, int status, int mask)
 {
-#if (defined CONFIG_MACH_XIAOMI_MIDO)
+#ifdef CONFIG_MACH_XIAOMI_MIDO
 	if (!status && (jack->jack->type&WCD_MBHC_JACK_MASK)) {
 		switch_set_state(&accdet_data, 0);
 	} else if (jack->jack->type&WCD_MBHC_JACK_MASK) {
@@ -2603,7 +2603,7 @@ err_mbhc_sw_irq:
 		mbhc->mbhc_cb->register_notifier(codec, &mbhc->nblock, false);
 	mutex_destroy(&mbhc->codec_resource_lock);
 err:
-#if (defined CONFIG_MACH_XIAOMI_MIDO)
+#ifdef CONFIG_MACH_XIAOMI_MIDO
 	switch_dev_unregister(&accdet_data);
 #endif
 	pr_debug("%s: leave ret %d\n", __func__, ret);
@@ -2627,7 +2627,7 @@ void wcd_mbhc_deinit(struct wcd_mbhc *mbhc)
 	if (mbhc->mbhc_cb && mbhc->mbhc_cb->register_notifier)
 		mbhc->mbhc_cb->register_notifier(codec, &mbhc->nblock, false);
 	mutex_destroy(&mbhc->codec_resource_lock);
-#if (defined CONFIG_MACH_XIAOMI_MIDO)
+#ifdef CONFIG_MACH_XIAOMI_MIDO
 	switch_dev_unregister(&accdet_data);
 #endif
 }
