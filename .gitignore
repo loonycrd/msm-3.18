@@ -96,6 +96,7 @@ x509.genkey
 
 # Kconfig presets
 all.config
+out/
 
 # fetched Android config fragments
 android/configs/android-*.cfg
