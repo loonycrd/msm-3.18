@@ -1150,14 +1150,14 @@ config TOUCHSCREEN_GT9XX
           If unsure, say N.
 
 config TOUCHSCREEN_GT9XX_MIDO
-        bool "Goodix touchpanel GT9xx series"
+        bool "Mido Goodix touchpanel"
         depends on I2C
         help
           Say Y here if you have a Goodix GT9xx mido touchscreen.
           Gt9xx controllers are multi touch controllers which can
           report 5 touches at a time.
 
-          If unsure, say N.
+          If unsure, say Y.
 
 config TOUCHSCREEN_MAXIM_STI
 	tristate "Maxim based STI touchscreens"
