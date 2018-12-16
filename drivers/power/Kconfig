@@ -58,10 +58,10 @@ config WM831X_POWER
 	  provided by Wolfson Microelectronics WM831x PMICs.
 
 config WM8350_POWER
-        tristate "WM8350 PMU support"
-        depends on MFD_WM8350
-        help
-          Say Y here to enable support for the power management unit
+    tristate "WM8350 PMU support"
+    depends on MFD_WM8350
+    help
+	  Say Y here to enable support for the power management unit
 	  provided by the Wolfson Microelectronics WM8350 PMIC.
 
 config TEST_POWER
@@ -151,9 +151,9 @@ config BATTERY_WM97XX
 	  Say Y to enable support for battery measured by WM97xx aux port.
 
 config BATTERY_SBS
-        tristate "SBS Compliant gas gauge"
-        depends on I2C
-        help
+    tristate "SBS Compliant gas gauge"
+    depends on I2C
+    help
 	  Say Y to include support for SBS battery driver for SBS-compliant
 	  gas gauges.
 
@@ -241,7 +241,7 @@ config CHARGER_PCF50633
 	tristate "NXP PCF50633 MBC"
 	depends on MFD_PCF50633
 	help
-	 Say Y to include support for NXP PCF50633 Main Battery Charger.
+	  Say Y to include support for NXP PCF50633 Main Battery Charger.
 
 config BATTERY_JZ4740
 	tristate "Ingenic JZ4740 battery"
@@ -318,11 +318,11 @@ config CHARGER_MANAGER
 	depends on REGULATOR && RTC_CLASS
 	select EXTCON
 	help
-          Say Y to enable charger-manager support, which allows multiple
-          chargers attached to a battery and multiple batteries attached to a
-          system. The charger-manager also can monitor charging status in
-          runtime and in suspend-to-RAM by waking up the system periodically
-          with help of suspend_again support.
+	  Say Y to enable charger-manager support, which allows multiple
+	  chargers attached to a battery and multiple batteries attached to a
+	  system. The charger-manager also can monitor charging status in
+	  runtime and in suspend-to-RAM by waking up the system periodically
+	  with help of suspend_again support.
 
 config CHARGER_MAX14577
 	tristate "Maxim MAX14577/77836 battery charger driver"
@@ -380,31 +380,31 @@ config SMB349_USB_CHARGER
 	tristate "smb349 usb charger (with VBUS detection)"
 	depends on I2C
 	help
-	 Say Y to enable support for the SMB349 switching mode based charger.
-	 The driver supports charging control (enable/disable) and
-	 charge-current limiting. It also provides USB VBUS detection and
-	 notification support. The driver controls SMB349 via I2C and
-	 supports device-tree interface.
+	  Say Y to enable support for the SMB349 switching mode based charger.
+	  The driver supports charging control (enable/disable) and
+	  charge-current limiting. It also provides USB VBUS detection and
+	  notification support. The driver controls SMB349 via I2C and
+	  supports device-tree interface.
 
 config SMB349_DUAL_CHARGER
 	tristate "smb349 dual charger"
 	depends on I2C
 	help
-	 Say Y to enable support for the SMB349 dual charger single path
-	 switching mode charger. The driver supports charging in conjuction
-	 with an external charger on the same path by providing hand-off
-	 control and charge-current limiting. The driver controls SMB349
-	 via I2C in STAT IRQ driven mode and supports device-tree interface.
+	  Say Y to enable support for the SMB349 dual charger single path
+	  switching mode charger. The driver supports charging in conjuction
+	  with an external charger on the same path by providing hand-off
+	  control and charge-current limiting. The driver controls SMB349
+	  via I2C in STAT IRQ driven mode and supports device-tree interface.
 
 config SMB1351_USB_CHARGER
 	tristate "smb1351 usb charger (with VBUS detection)"
 	depends on I2C
 	help
-	 Say Y to enable support for the SMB1351 switching mode based charger.
-	 The driver supports charging control (enable/disable) and
-	 charge-current limiting. It also provides USB VBUS detection and
-	 notification support. The driver controls SMB1351 via I2C and
-	 supports device-tree interface.
+	  Say Y to enable support for the SMB1351 switching mode based charger.
+	  The driver supports charging control (enable/disable) and
+	  charge-current limiting. It also provides USB VBUS detection and
+	  notification support. The driver controls SMB1351 via I2C and
+	  supports device-tree interface.
 
 config SMB350_CHARGER
 	tristate "smb350 charger"
@@ -517,7 +517,7 @@ config QPNP_SMB2
 	  This module also interfaces USB PD for power-delivery support.
 
 config QPNP_LEGACY_CYCLE_COUNT
-        tristate "QPNP FG fuel gauge cycle count bins"
+	tristate "QPNP FG fuel gauge cycle count bins"
 	default y
 	help
 	  Say Y here to enable the QPNP FG initial QCOM cycle count implementation.
