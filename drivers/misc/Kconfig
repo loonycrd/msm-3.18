@@ -553,13 +553,6 @@ config VEXPRESS_SYSCFG
 	  bus. System Configuration interface is one of the possible means
 	  of generating transactions on this bus.
 
-config UID_SYS_STATS
-	bool "Per-UID statistics"
-	depends on PROFILING && TASK_XACCT && TASK_IO_ACCOUNTING
-	help
-	  Per UID based cpu time statistics exported to /proc/uid_cputime
-	  Per UID based io statistics exported to /proc/uid_io
-
 config USB_EXT_TYPE_C_PERICOM
 	tristate "USB Type-C charger detection support using Pericom chip"
 	depends on I2C && POWER_SUPPLY
@@ -599,6 +592,13 @@ config QPNP_MISC
 	  peripheral. The MISC peripheral holds the USB ID interrupt
 	  and the driver provides an API to check if this interrupt
 	  is available on the current PMIC chip.
+
+config UID_SYS_STATS
+	bool "Per-UID statistics"
+	depends on PROFILING && TASK_XACCT && TASK_IO_ACCOUNTING
+	help
+	  Per UID based cpu time statistics exported to /proc/uid_cputime
+	  Per UID based io statistics exported to /proc/uid_io
 
 config UID_SYS_STATS_DEBUG
 	bool "Per-TASK statistics"
