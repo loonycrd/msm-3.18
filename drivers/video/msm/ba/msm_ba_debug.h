@@ -57,6 +57,12 @@ extern int msm_ba_debug_out;
 	__str; \
 	})
 
+#if defined(CONFIG_TRACING) && defined(DEBUG)
+#define msm_trace_printk(...) trace_printk(__VA_ARGS__)
+#else
+#define msm_trace_printk(...)
+#endif
+
 #define dprintk(__level, __fmt, arg...)	\
 	do { \
 		if (msm_ba_debug & __level) { \
@@ -66,7 +72,7 @@ extern int msm_ba_debug_out;
 						BA_MSG_PRIO2STRING(__level), \
 						## arg); \
 			} else if (msm_ba_debug_out == BA_OUT_FTRACE) { \
-				trace_printk(KERN_DEBUG BA_DBG_TAG __fmt "\n", \
+				msm_trace_printk(KERN_DEBUG BA_DBG_TAG __fmt "\n", \
 						__LINE__, \
 						BA_MSG_PRIO2STRING(__level), \
 						## arg); \
