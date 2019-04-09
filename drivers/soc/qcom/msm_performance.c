@@ -102,20 +102,12 @@ static struct trig_thr thr;
 /* Work to evaluate the onlining/offlining CPUs */
 struct delayed_work evaluate_hotplug_work;
 
-/* To handle cpufreq min/max request */
-struct cpu_status {
-	unsigned int min;
-	unsigned int max;
-};
-static DEFINE_PER_CPU(struct cpu_status, cpu_stats);
-
 static unsigned int num_online_managed(struct cpumask *mask);
 static int init_cluster_control(void);
 static int rm_high_pwr_cost_cpus(struct cluster *cl);
 static int init_events_group(void);
 static int register_input_handler(void);
 static void unregister_input_handler(void);
-
 
 static DEFINE_PER_CPU(unsigned int, cpu_power_cost);
 
@@ -365,165 +357,6 @@ static const struct kernel_param_ops param_ops_managed_online_cpus = {
 device_param_cb(managed_online_cpus, &param_ops_managed_online_cpus,
 							NULL, 0444);
 #endif
-/*
- * Userspace sends cpu#:min_freq_value to vote for min_freq_value as the new
- * scaling_min. To withdraw its vote it needs to enter cpu#:0
- */
-static int set_cpu_min_freq(const char *buf, const struct kernel_param *kp)
-{
-#if 0
-	int i, j, ntokens = 0;
-	unsigned int val, cpu;
-	const char *cp = buf;
-	struct cpu_status *i_cpu_stats;
-	struct cpufreq_policy policy;
-	cpumask_var_t limit_mask;
-	int ret;
-
-	while ((cp = strpbrk(cp + 1, " :")))
-		ntokens++;
-
-	/* CPU:value pair */
-	if (!(ntokens % 2))
-		return -EINVAL;
-
-	cp = buf;
-	cpumask_clear(limit_mask);
-	for (i = 0; i < ntokens; i += 2) {
-		if (sscanf(cp, "%u:%u", &cpu, &val) != 2)
-			return -EINVAL;
-		if (cpu > (num_present_cpus() - 1))
-			return -EINVAL;
-
-		i_cpu_stats = &per_cpu(cpu_stats, cpu);
-
-		i_cpu_stats->min = val;
-		cpumask_set_cpu(cpu, limit_mask);
-
-		cp = strnchr(cp, strlen(cp), ' ');
-		cp++;
-	}
-
-	/*
-	 * Since on synchronous systems policy is shared amongst multiple
-	 * CPUs only one CPU needs to be updated for the limit to be
-	 * reflected for the entire cluster. We can avoid updating the policy
-	 * of other CPUs in the cluster once it is done for at least one CPU
-	 * in the cluster
-	 */
-	get_online_cpus();
-	for_each_cpu(i, limit_mask) {
-		i_cpu_stats = &per_cpu(cpu_stats, i);
-
-		if (cpufreq_get_policy(&policy, i))
-			continue;
-
-		if (cpu_online(i) && (policy.min != i_cpu_stats->min)) {
-			ret = cpufreq_update_policy(i);
-			if (ret)
-				continue;
-		}
-		for_each_cpu(j, policy.related_cpus)
-			cpumask_clear_cpu(j, limit_mask);
-	}
-	put_online_cpus();
-#endif
-
-	return 0;
-}
-
-static int get_cpu_min_freq(char *buf, const struct kernel_param *kp)
-{
-	int cnt = 0, cpu;
-
-	for_each_present_cpu(cpu) {
-		cnt += snprintf(buf + cnt, PAGE_SIZE - cnt,
-				"%d:%u ", cpu, per_cpu(cpu_stats, cpu).min);
-	}
-	cnt += snprintf(buf + cnt, PAGE_SIZE - cnt, "\n");
-	return cnt;
-}
-
-static const struct kernel_param_ops param_ops_cpu_min_freq = {
-	.set = set_cpu_min_freq,
-	.get = get_cpu_min_freq,
-};
-module_param_cb(cpu_min_freq, &param_ops_cpu_min_freq, NULL, 0644);
-
-/*
- * Userspace sends cpu#:max_freq_value to vote for max_freq_value as the new
- * scaling_max. To withdraw its vote it needs to enter cpu#:UINT_MAX
- */
-static int set_cpu_max_freq(const char *buf, const struct kernel_param *kp)
-{
-	int i, j, ntokens = 0;
-	unsigned int val, cpu;
-	const char *cp = buf;
-	struct cpu_status *i_cpu_stats;
-	struct cpufreq_policy policy;
-	cpumask_var_t limit_mask;
-	int ret;
-
-	while ((cp = strpbrk(cp + 1, " :")))
-		ntokens++;
-
-	/* CPU:value pair */
-	if (!(ntokens % 2))
-		return -EINVAL;
-
-	cp = buf;
-	cpumask_clear(limit_mask);
-	for (i = 0; i < ntokens; i += 2) {
-		if (sscanf(cp, "%u:%u", &cpu, &val) != 2)
-			return -EINVAL;
-		if (cpu > (num_present_cpus() - 1))
-			return -EINVAL;
-
-		i_cpu_stats = &per_cpu(cpu_stats, cpu);
-
-		i_cpu_stats->max = val;
-		cpumask_set_cpu(cpu, limit_mask);
-
-		cp = strnchr(cp, strlen(cp), ' ');
-		cp++;
-	}
-
-	get_online_cpus();
-	for_each_cpu(i, limit_mask) {
-		i_cpu_stats = &per_cpu(cpu_stats, i);
-		if (cpufreq_get_policy(&policy, i))
-			continue;
-
-		if (cpu_online(i) && (policy.max != i_cpu_stats->max)) {
-			ret = cpufreq_update_policy(i);
-			if (ret)
-				continue;
-		}
-		for_each_cpu(j, policy.related_cpus)
-			cpumask_clear_cpu(j, limit_mask);
-	}
-	put_online_cpus();
-
-	return 0;
-}
-
-static int get_cpu_max_freq(char *buf, const struct kernel_param *kp)
-{
-	int cnt = 0, cpu;
-
-	for_each_present_cpu(cpu) {
-		cnt += snprintf(buf + cnt, PAGE_SIZE - cnt,
-				"%d:%u ", cpu, per_cpu(cpu_stats, cpu).max);
-	}
-	cnt += snprintf(buf + cnt, PAGE_SIZE - cnt, "\n");
-	return cnt;
-}
-
-static const struct kernel_param_ops param_ops_cpu_max_freq = {
-	.set = set_cpu_max_freq,
-	.get = get_cpu_max_freq,
-};
-module_param_cb(cpu_max_freq, &param_ops_cpu_max_freq, NULL, 0644);
 
 static int set_ip_evt_trigger_threshold(const char *buf,
 		const struct kernel_param *kp)
@@ -1554,34 +1387,6 @@ static unsigned int num_online_managed(struct cpumask *mask)
 
 	return cpumask_weight(&tmp_mask);
 }
-
-static int perf_adjust_notify(struct notifier_block *nb, unsigned long val,
-							void *data)
-{
-	struct cpufreq_policy *policy = data;
-	unsigned int cpu = policy->cpu;
-	struct cpu_status *cpu_st = &per_cpu(cpu_stats, cpu);
-	unsigned int min = cpu_st->min, max = cpu_st->max;
-
-
-	if (val != CPUFREQ_ADJUST)
-		return NOTIFY_OK;
-
-	pr_debug("msm_perf: CPU%u policy before: %u:%u kHz\n", cpu,
-						policy->min, policy->max);
-	pr_debug("msm_perf: CPU%u seting min:max %u:%u kHz\n", cpu, min, max);
-
-	cpufreq_verify_within_limits(policy, min, max);
-
-	pr_debug("msm_perf: CPU%u policy after: %u:%u kHz\n", cpu,
-						policy->min, policy->max);
-
-	return NOTIFY_OK;
-}
-
-static struct notifier_block perf_cpufreq_nb = {
-	.notifier_call = perf_adjust_notify,
-};
 
 static bool check_notify_status(void)
 {
@@ -2740,15 +2545,9 @@ static int init_events_group(void)
 
 static int __init msm_performance_init(void)
 {
-	unsigned int cpu;
-
-	cpufreq_register_notifier(&perf_cpufreq_nb, CPUFREQ_POLICY_NOTIFIER);
 	cpufreq_register_notifier(&perf_govinfo_nb, CPUFREQ_GOVINFO_NOTIFIER);
 	cpufreq_register_notifier(&perf_cputransitions_nb,
 					CPUFREQ_TRANSITION_NOTIFIER);
-
-	for_each_present_cpu(cpu)
-		per_cpu(cpu_stats, cpu).max = UINT_MAX;
 
 	register_cpu_notifier(&msm_performance_cpu_notifier);
 
