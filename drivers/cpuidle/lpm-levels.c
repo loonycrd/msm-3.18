@@ -87,7 +87,7 @@ static DEFINE_PER_CPU(struct lpm_cluster*, cpu_cluster);
 static bool suspend_in_progress;
 static struct hrtimer lpm_hrtimer;
 static struct lpm_debug *const lpm_debug = NULL;
-static phys_addr_t lpm_debug_phys;
+//static phys_addr_t lpm_debug_phys;
 
 DEFINE_PER_CPU(struct clk *, cpu_clocks);
 static struct clk *l2_clk;
