@@ -7,4 +7,11 @@ source "drivers/platform/chrome/Kconfig"
 
 if ARCH_MSM
 source "drivers/platform/msm/Kconfig"
+
+config MACH_XIAOMI_MIDO
+    bool "Enable support for Redmi Note 4"
+    depends on ARCH_MSM8953
+    help
+      Support for Redmi Note 4
+
 endif
